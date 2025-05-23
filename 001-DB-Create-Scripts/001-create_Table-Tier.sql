@@ -1,7 +1,7 @@
 -- ==================================================================================
 -- Abschlussprojekt TierTaxi von Simone Moeller, Theresa Duerbeck und Rebekka Kupffer
 -- Informationen zu diesem Script: Tier Tabelle erstellen
--- Authorin(-nen): Rebekka
+-- Authorin(-nen): Rebekka, Theresa
 -- ==================================================================================
 
 USE [TierTaxi]
