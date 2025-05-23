@@ -1,0 +1,5 @@
+-- ==================================================================================
+-- Abschlussprojekt TierTaxi von Simone Möller, Theresa Dürbeck und Rebekka Kupffer
+-- Informationen zu diesem Script: 
+-- Authorin(-nen): 
+-- ==================================================================================
