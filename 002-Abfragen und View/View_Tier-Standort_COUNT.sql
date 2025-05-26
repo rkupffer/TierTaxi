@@ -1,6 +1,8 @@
 -- Sicht ueber mehrere Tabellen mit Count
 -- Tiere an den verfuegbaren Standorten zaehlen
 
+USE [TierTaxi]
+GO
 
 SELECT   COUNT(dbo.tb_Tier.Tier_ID), dbo.tb_Standort.Standort
 FROM     dbo.tb_Tier INNER JOIN

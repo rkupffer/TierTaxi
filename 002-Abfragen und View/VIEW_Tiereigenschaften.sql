@@ -16,5 +16,4 @@ FROM            dbo.tb_Tier INNER JOIN
                          dbo.tb_Transportwege ON dbo.tb_Tierart.Transportweg_ID = dbo.tb_Transportwege.Transportwege_ID INNER JOIN
                          dbo.tb_Standort ON dbo.tb_Tier.Standort_ID = dbo.tb_Standort.Standort_ID
 
-ORDER BY Standort
 GO
