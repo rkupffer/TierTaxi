@@ -27,8 +27,7 @@ SELECT  dbo.tb_Kunden.Kunden_ID,
 		dbo.tb_Tier.Tier_ID, 
 		dbo.tb_Tier.Standort_ID AS 'TierStandort', 
 		dbo.tb_Tierart.Mitnahmegewicht, 
-		dbo.tb_Tierart.Tierart, 
-        dbo.tb_Tierart.Arbeitszeit_Max
+		dbo.tb_Tierart.Tierart
 FROM         dbo.tb_Kunden INNER JOIN
                          dbo.tb_Standort ON dbo.tb_Kunden.Standort_ID = dbo.tb_Standort.Standort_ID INNER JOIN
                          dbo.tb_Tier ON dbo.tb_Standort.Standort_ID = dbo.tb_Tier.Standort_ID INNER JOIN
