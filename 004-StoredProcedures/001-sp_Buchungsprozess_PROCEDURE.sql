@@ -76,6 +76,20 @@ BEGIN
 			VALUES (@KundenID, 2, @tier_id, NULL, NULL);
 
 		-- ========================================================================
+		-- Aktuelle Auftrags_ID in Variable fuer spaeter speichern
+		-- ========================================================================
+
+		DECLARE @auftrags_id int;
+
+		SET @auftrags_id =
+		(
+		SELECT [Auftrags_ID]
+		FROM [dbo].[tb_Auftraege]
+		WHERE Kunde_ID = @KundenID
+		AND Auftagsstatus_ID = 2
+		)
+
+		-- ========================================================================
 		-- Ist das TAP aktuell und gueltig?
 		-- ========================================================================
 		DECLARE @TAP int;
@@ -95,6 +109,8 @@ BEGIN
 		-- Ist das Tier gerade verfuegbar?
 		-- Test: ist Tier_ID Auftragsstatus = 3
 		-- ========================================================================
+		
+
 		SET @counter =
 		(
 		SELECT  COUNT(Auftagsstatus_ID)
@@ -104,19 +120,19 @@ BEGIN
 		)
 		IF @counter = 0
 
-			INSERT INTO dbo.tb_Auftraege
-			([Kunde_ID], [Auftagsstatus_ID], [Tier_ID], [DatumUhrzeitStart], [DatumUhrzeitEnde])
-			VALUES (@KundenID, 3, @tier_id, NULL, NULL);
+			UPDATE dbo.tb_Auftraege
+			SET Auftagsstatus_ID = 3
+			WHERE Auftrags_ID = @auftrags_id
 
 
 		ELSE
-
-			INSERT INTO dbo.tb_Auftraege
-			([Kunde_ID], [Auftagsstatus_ID], [Tier_ID], [DatumUhrzeitStart], [DatumUhrzeitEnde])
-			VALUES (@KundenID, 7, NULL, NULL, NULL);
+		BEGIN
+			UPDATE dbo.tb_Auftraege
+			SET Auftagsstatus_ID = 7
+			WHERE Auftrags_ID = @auftrags_id;
 
 			THROW 50003,'FEHLER: Das Tier ist momentan in einem anderen Auftrag in Durchfuehrung. Bitte fragen Sie zu einem anderen Zeitpunkt erneut nach.',1;
-		
+		END
 
 		-- ========================================================================
 		-- Ist die maximale Arbeitszeit schon erreicht?
