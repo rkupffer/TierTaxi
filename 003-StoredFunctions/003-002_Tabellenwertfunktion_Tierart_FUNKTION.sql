@@ -8,7 +8,7 @@ GO
 -- =============================================
 -- TierID eingeben und Futterpraeferenz ausgeben
 -- =============================================
-CREATE FUNCTION tf_Futterpraeferenz
+CREATE OR ALTER FUNCTION tf_Futterpraeferenz
 (	
 	@Tierart nchar(20)
 )
