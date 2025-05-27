@@ -95,6 +95,28 @@ BEGIN
 		-- Ist das Tier gerade verfuegbar?
 		-- Test: ist Tier_ID Auftragsstatus = 3
 		-- ========================================================================
+		SET @counter =
+		(
+		SELECT  COUNT(Auftagsstatus_ID)
+		FROM    dbo.tb_Auftraege
+		WHERE   Tier_ID = @tier_id
+		AND		Auftagsstatus_ID = 3
+		)
+		IF @counter = 0
+
+			INSERT INTO dbo.tb_Auftraege
+			([Kunde_ID], [Auftagsstatus_ID], [Tier_ID], [DatumUhrzeitStart], [DatumUhrzeitEnde])
+			VALUES (@KundenID, 3, @tier_id, NULL, NULL);
+
+
+		ELSE
+
+			INSERT INTO dbo.tb_Auftraege
+			([Kunde_ID], [Auftagsstatus_ID], [Tier_ID], [DatumUhrzeitStart], [DatumUhrzeitEnde])
+			VALUES (@KundenID, 7, NULL, NULL, NULL);
+
+			THROW 50003,'FEHLER: Das Tier ist momentan in einem anderen Auftrag in Durchfuehrung. Bitte fragen Sie zu einem anderen Zeitpunkt erneut nach.',1;
+		
 
 		-- ========================================================================
 		-- Ist die maximale Arbeitszeit schon erreicht?

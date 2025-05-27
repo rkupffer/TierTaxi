@@ -61,3 +61,37 @@ EXEC [dbo].[sp_Buchungsprozess]
 
 PRINT @Erfolg;
 PRINT @Feedback;
+
+-- ===================================================================================================
+-- Test5: Kunde exsistiert und am Standort gibt es ein geeignetes Tier, das ein gueltiges TAP hat,
+-- UND: das Tier befindet sich NICHT in einem anderen Auftrag
+	--> Wir der Auftragsstatus korrekt in die Tabelle Auftraege uebernommen?
+-- ===================================================================================================
+DECLARE	@Erfolg bit; -- geklappt oder nicht
+DECLARE	@Feedback NVARCHAR(MAX); -- Fehlermeldungen etc.
+
+EXEC [dbo].[sp_Buchungsprozess]
+	1, -- KundenID
+	----------------------- 
+	@Erfolg OUTPUT,
+	@Feedback OUTPUT;
+
+PRINT @Erfolg;
+PRINT @Feedback;
+
+-- ===================================================================================================
+-- Test6: Kunde exsistiert und am Standort gibt es ein geeignetes Tier, das ein gueltiges TAP hat,
+-- UND: das Tier befindet sich in einem anderen Auftrag
+	--> Korrekter Fehler?
+-- ===================================================================================================
+DECLARE	@Erfolg bit; -- geklappt oder nicht
+DECLARE	@Feedback NVARCHAR(MAX); -- Fehlermeldungen etc.
+
+EXEC [dbo].[sp_Buchungsprozess]
+	4, -- KundenID
+	----------------------- 
+	@Erfolg OUTPUT,
+	@Feedback OUTPUT;
+
+PRINT @Erfolg;
+PRINT @Feedback;
