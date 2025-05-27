@@ -110,13 +110,13 @@ BEGIN
 
 
 		ELSE
-
+		BEGIN
 			INSERT INTO dbo.tb_Auftraege
 			([Kunde_ID], [Auftagsstatus_ID], [Tier_ID], [DatumUhrzeitStart], [DatumUhrzeitEnde])
 			VALUES (@KundenID, 7, NULL, NULL, NULL);
 
 			THROW 50003,'FEHLER: Das Tier ist momentan in einem anderen Auftrag in Durchfuehrung. Bitte fragen Sie zu einem anderen Zeitpunkt erneut nach.',1;
-		
+		END
 
 		-- ========================================================================
 		-- Ist die maximale Arbeitszeit schon erreicht?
