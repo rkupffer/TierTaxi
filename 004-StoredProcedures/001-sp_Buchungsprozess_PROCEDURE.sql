@@ -74,6 +74,27 @@ BEGIN
 			INSERT INTO dbo.tb_Auftraege
 			([Kunde_ID], [Auftagsstatus_ID], [Tier_ID], [DatumUhrzeitStart], [DatumUhrzeitEnde])
 			VALUES (@KundenID, 2, @tier_id, NULL, NULL);
+
+		-- ========================================================================
+		-- Ist das TAP aktuell und gueltig?
+		-- TAP = 1 AND letztes Datum in Frequenz 
+		-- ========================================================================
+
+		-- ========================================================================
+		-- Ist das Tier gerade verfuegbar?
+		-- Test: ist Tier_ID Auftragsstatus = 3
+		-- ========================================================================
+
+		-- ========================================================================
+		-- Ist die maximale Arbeitszeit schon erreicht?
+		-- Arbeitsstunden_max 
+		-- ========================================================================
+
+		-- ========================================================================
+		-- Auftragsstatus 3: in Durchführung
+		-- Tier auf nicht mehr verfügbar setzen
+		-- Auftragsstatus aktualisieren
+		-- ========================================================================
 		
 	END TRY 
 
