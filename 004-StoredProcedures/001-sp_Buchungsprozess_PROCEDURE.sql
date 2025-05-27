@@ -77,8 +77,19 @@ BEGIN
 
 		-- ========================================================================
 		-- Ist das TAP aktuell und gueltig?
-		-- TAP = 1 AND letztes Datum in Frequenz 
 		-- ========================================================================
+		DECLARE @TAP int;
+
+		SET @TAP =
+		(
+		SELECT Tap_ID
+		FROM tb_Tier
+		WHERE Tier_ID = @tier_id
+		)
+
+		IF @TAP = 2
+
+			THROW 50002,'FEHLER: Das ausgewaehlte Tier hat kein gueltiges Tierarztzertifikat!',1;
 
 		-- ========================================================================
 		-- Ist das Tier gerade verfuegbar?
