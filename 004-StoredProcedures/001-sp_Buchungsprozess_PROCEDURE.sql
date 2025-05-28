@@ -54,6 +54,7 @@ BEGIN
 		DECLARE @tier_id int;
 		DECLARE @i int =1;
 		DECLARE @status int;
+		DECLARE @Futterkosten money
 
 		-- ========================================================================
 		-- Auf Tabellenwertfunktion zugreifen und ueberpruefen, wie viele Tiere am 
@@ -129,9 +130,20 @@ BEGIN
 			-- ========================================
 			ELSE
 				BEGIN
+				 
+				SET @Futterkosten = 
+				(
+				SELECT dbo.tb_Futterkosten.KostenProStunde
+				FROM dbo.tb_Futterkosten INNER JOIN
+					dbo.tb_Tierart 
+				ON dbo.tb_Futterkosten.Futterkosten_ID = dbo.tb_Tierart.Futterkosten_ID INNER JOIN
+					dbo.tb_Tier 
+				ON dbo.tb_Tierart.Tierart_ID = dbo.tb_Tier.Tierart_ID
+				WHERE (dbo.tb_Tier.Tier_ID = @tier_id)
+				)
 					INSERT INTO dbo.tb_Auftraege
-					([Kunde_ID], [Auftragsstatus_ID], [Tier_ID], [DatumUhrzeitStart], [DatumUhrzeitEnde])
-					VALUES (@KundenID, 3, @tier_id, NULL, NULL);
+					([Kunde_ID], [Auftragsstatus_ID], [Tier_ID], [DatumUhrzeitStart], [DatumUhrzeitEnde],[FutterKostenProStunde])
+					VALUES (@KundenID, 3, @tier_id, NULL, NULL,@Futterkosten);
 
 					PRINT('Die Buchung war erfolgreich. Gute Fahrt!')
 				END
@@ -172,9 +184,20 @@ BEGIN
 			-- ========================================
 			ELSE
 				BEGIN
+				 
+				SET @Futterkosten = 
+				(
+				SELECT dbo.tb_Futterkosten.KostenProStunde
+				FROM dbo.tb_Futterkosten INNER JOIN
+					dbo.tb_Tierart 
+				ON dbo.tb_Futterkosten.Futterkosten_ID = dbo.tb_Tierart.Futterkosten_ID INNER JOIN
+					dbo.tb_Tier 
+				ON dbo.tb_Tierart.Tierart_ID = dbo.tb_Tier.Tierart_ID
+				WHERE (dbo.tb_Tier.Tier_ID = @tier_id)
+				)
 					INSERT INTO dbo.tb_Auftraege
-					([Kunde_ID], [Auftragsstatus_ID], [Tier_ID], [DatumUhrzeitStart], [DatumUhrzeitEnde])
-					VALUES (@KundenID, 3, @tier_id, NULL, NULL);
+					([Kunde_ID], [Auftragsstatus_ID], [Tier_ID], [DatumUhrzeitStart], [DatumUhrzeitEnde],[FutterKostenProStunde])
+					VALUES (@KundenID, 3, @tier_id, NULL, NULL,@Futterkosten);
 
 					PRINT('Die Buchung war erfolgreich. Gute Fahrt!')
 				END
