@@ -22,7 +22,7 @@ BEGIN
 
 	SET @hilfsvariable =
 	(
-	SELECT   dbo.tb_Auftraege.Auftagsstatus_ID 
+	SELECT   dbo.tb_Auftraege.Auftragsstatus_ID 
 	FROM     dbo.tb_Auftraege
 	WHERE	 Tier_ID = @Tier_ID
 	)
