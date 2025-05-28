@@ -12,11 +12,8 @@ GO
 
 CREATE OR ALTER PROCEDURE sp_Buchungsprozess
 	@KundenID int,
---	@TierID int,
---	@AuftragsID int,
 	-----
 	@Erfolg bit OUTPUT, -- geklappt oder nicht
---	@vorhanden bit OUTPUT, -- Tier am Standort oder nicht
 	@Feedback NVARCHAR(MAX) OUTPUT -- Fehlermeldungen etc.
 AS
 BEGIN
@@ -25,9 +22,6 @@ BEGIN
 	SET NOCOUNT ON;	
 	
 	-- Hilfsvariable definieren
-	-- DECLARE @CheckResult AS bit;
-	DECLARE @counter int;
-	DECLARE @tier_id int;
 	DECLARE @CheckResult bit;
 
 	BEGIN TRY 
@@ -38,112 +32,167 @@ BEGIN
 		
 		SET @CheckResult =
 		(
-		SELECT Kunden_ID
-		FROM tb_Kunden
-		WHERE Kunden_ID = @KundenID
+		SELECT	Kunden_ID
+		FROM	tb_Kunden
+		WHERE	Kunden_ID = @KundenID
 		)
 
 		IF @CheckResult IS NULL
 
 			THROW 50001,'FEHLER: Diese KundenID ist uns nicht bekannt!',1;
 
-		-- ========================================================================
-		-- Ist das Tier vorhanden?
-		-- Auftragsstatus 2: genehmigt oder Auftragsstatus 7: abgelehnt 
-		-- ========================================================================
+		ELSE PRINT('Hallo Kunde, Sie sind bereits in unserer Datenbank und können Tiere mieten.')
 
-		-- auf Tabellenwertfunktion zugreifen und ueberpruefen, wie viele Tiere am Standort verfuegbar sind
+		-- ========================================================================
+		-- Ist ein geeignetes Tier fuer den Kunden vorhanden?
+		--		- Tier muss am Kundenstandort sein
+		--		- Tier muss Gewicht von Kunden leisten koennen
+		--		- Tier muss ueber ein gueltiges TAP verfuegen
+		--			--> tf_Verfuegbarkeit_Tier
+		-- ========================================================================
+		DECLARE @counter int;
+		DECLARE @tier_id int;
+		DECLARE @i int =1;
+		DECLARE @status int;
+
+		-- ========================================================================
+		-- Auf Tabellenwertfunktion zugreifen und ueberpruefen, wie viele Tiere am 
+		-- Standort verfuegbar sind, die die oben genannten Kriterien erfuellen.
+		-- ========================================================================
 		SET @counter =
 		(
-		SELECT COUNT(Tier)
+		SELECT COUNT(Tier_ID)
 		FROM tf_Verfuegbarkeit_Tier(@KundenID)
 		)
 
-		SET @tier_id =
-		(
-		SELECT TOP (1) Tier_ID
-		FROM tf_Verfuegbarkeit_Tier(@KundenID)
-		)
-
-		IF @counter=0 -- kein Tier verfuegbar -> Auftrag ablehnen
+		-- ========================================================================
+		-- Wenn kein Tier verfuegbar soll eine Fehlermeldung ausgeworfen werden
+		-- ========================================================================
+		IF @counter = 0
+		BEGIN
 			INSERT INTO dbo.tb_Auftraege
 			([Kunde_ID], [Auftagsstatus_ID], [Tier_ID], [DatumUhrzeitStart], [DatumUhrzeitEnde])
 			VALUES (@KundenID, 7, NULL, NULL, NULL);
 
-		ELSE
-			INSERT INTO dbo.tb_Auftraege
-			([Kunde_ID], [Auftagsstatus_ID], [Tier_ID], [DatumUhrzeitStart], [DatumUhrzeitEnde])
-			VALUES (@KundenID, 2, @tier_id, NULL, NULL);
-
-		-- ========================================================================
-		-- Aktuelle Auftrags_ID in Variable fuer spaeter speichern
-		-- ========================================================================
-
-		DECLARE @auftrags_id int;
-
-		SET @auftrags_id =
-		(
-		SELECT [Auftrags_ID]
-		FROM [dbo].[tb_Auftraege]
-		WHERE Kunde_ID = @KundenID
-		AND Auftagsstatus_ID = 2
-		)
-
-		-- ========================================================================
-		-- Ist das TAP aktuell und gueltig?
-		-- ========================================================================
-		DECLARE @TAP int;
-
-		SET @TAP =
-		(
-		SELECT Tap_ID
-		FROM tb_Tier
-		WHERE Tier_ID = @tier_id
-		)
-
-		IF @TAP = 2
-
-			THROW 50002,'FEHLER: Das ausgewaehlte Tier hat kein gueltiges Tierarztzertifikat!',1;
-
-		-- ========================================================================
-		-- Ist das Tier gerade verfuegbar?
-		-- Test: ist Tier_ID Auftragsstatus = 3
-		-- ========================================================================
-		
-
-		SET @counter =
-		(
-		SELECT  COUNT(Auftagsstatus_ID)
-		FROM    dbo.tb_Auftraege
-		WHERE   Tier_ID = @tier_id
-		AND		Auftagsstatus_ID = 3
-		)
-		IF @counter = 0
-
-			UPDATE dbo.tb_Auftraege
-			SET Auftagsstatus_ID = 3
-			WHERE Auftrags_ID = @auftrags_id
-
-
-		ELSE
-		BEGIN
-			UPDATE dbo.tb_Auftraege
-			SET Auftagsstatus_ID = 7
-			WHERE Auftrags_ID = @auftrags_id;
-
-			THROW 50003,'FEHLER: Das Tier ist momentan in einem anderen Auftrag in Durchfuehrung. Bitte fragen Sie zu einem anderen Zeitpunkt erneut nach.',1;
+			THROW 50002,'FEHLER: Momentan ist kein geeignetes Tier fuer Sie verfuegbar. Bitte fragen Sie zu einem anderen Zeitpunkt erneut nach.', 1;
 		END
 
 		-- ========================================================================
-		-- Ist die maximale Arbeitszeit schon erreicht?
-		-- Arbeitsstunden_max 
+		-- Wenn mehrere Tiere am Kundenstandort verfuegbar sind:
 		-- ========================================================================
+		IF @counter > 1
+		BEGIN
+			-- ========================================
+			-- Ein Tier auswaehlen
+			-- ========================================
+			WHILE (@i < @counter )
+				BEGIN
+					-- aktuelle Tier_id auswaehlen
+					SELECT	@tier_id = Tier_ID
+					FROM	(
+						SELECT	Tier_ID, ROW_NUMBER() OVER (ORDER BY Tier_ID) AS RowNum
+						FROM	tf_Verfuegbarkeit_Tier(8)
+					) as NumberedRows
+					WHERE RowNum = @i
+
+					-- Auftragsstatus des Tiers pruefen
+					SET @status =
+						(
+						SELECT [dbo].[sf_Tier_in_Durchfuehrung](@tier_id)
+						)
+
+					-- wenn freies Tier gefunden --> While-Schleife verlassen
+					IF @status=0
+						BREAK
+
+				SET @i = @i + 1
+
+				END -- while schleife
+
+			-- ========================================
+			-- Wenn die WHILE Schleife endet und der Status
+			-- noch auf 1 steht, sind alle Tiere gerade im
+			-- Status "in Durchfuehrung".
+			-- --> Kein Tier zum ausleihen verfuegbar.
+			-- ========================================
+			IF @status = 1
+				BEGIN
+					INSERT INTO dbo.tb_Auftraege
+					([Kunde_ID], [Auftagsstatus_ID], [Tier_ID], [DatumUhrzeitStart], [DatumUhrzeitEnde])
+					VALUES (@KundenID, 7, NULL, NULL, NULL);
+
+					THROW 50003,'FEHLER: Momentan befinden sich alle Tiere in Betrieb. Bitte fragen Sie zu einem anderen Zeitpunkt erneut nach.', 1;
+				END
+
+			-- ========================================
+			-- Neuen Auftrag anlegen
+			-- ========================================
+			ELSE
+				BEGIN
+					INSERT INTO dbo.tb_Auftraege
+					([Kunde_ID], [Auftagsstatus_ID], [Tier_ID], [DatumUhrzeitStart], [DatumUhrzeitEnde])
+					VALUES (@KundenID, 2, @tier_id, NULL, NULL);
+
+					PRINT('Die Buchung war erfolgreich. Gute Fahrt!')
+				END
+
+			-- ========================================
+			-- Aktuelle Auftrags_ID in Variable fuer 
+			-- spaeter speichern
+			-- ========================================
+			DECLARE @auftrags_id int;
+			SET @auftrags_id =
+			(
+			SELECT	[Auftrags_ID]
+			FROM	[dbo].[tb_Auftraege]
+			WHERE	Kunde_ID = @KundenID
+			AND		Auftagsstatus_ID = 2
+			)
+
+		END -- if-Abfrage counter>0
 
 		-- ========================================================================
-		-- Auftragsstatus 3: in Durchführung
-		-- Tier auf nicht mehr verfügbar setzen
-		-- Auftragsstatus aktualisieren
+		-- Wenn genau ein geeignetes Tier am Kundenstandort verfuegbar ist.
 		-- ========================================================================
+		IF @counter=1
+			BEGIN
+				SET @tier_id =
+				(
+				SELECT Tier_ID
+				FROM tf_Verfuegbarkeit_Tier(@KundenID)
+				)
+				-- Auftragsstatus des Tiers pruefen
+				SET @status =
+				(
+				SELECT [dbo].[sf_Tier_in_Durchfuehrung](@tier_id)
+				)
+
+			-- ========================================
+			-- Status=1: "in Durchfuehrung".
+			-- --> Kein Tier zum ausleihen verfuegbar.
+			-- ========================================
+			IF @status = 1
+				BEGIN
+					INSERT INTO dbo.tb_Auftraege
+					([Kunde_ID], [Auftagsstatus_ID], [Tier_ID], [DatumUhrzeitStart], [DatumUhrzeitEnde])
+					VALUES (@KundenID, 7, NULL, NULL, NULL);
+
+					THROW 50003,'FEHLER: Momentan befinden sich alle Tiere in Betrieb. Bitte fragen Sie zu einem anderen Zeitpunkt erneut nach.', 1;
+				END
+
+			-- ========================================
+			-- Neuen Auftrag anlegen
+			-- ========================================
+			ELSE
+				BEGIN
+					INSERT INTO dbo.tb_Auftraege
+					([Kunde_ID], [Auftagsstatus_ID], [Tier_ID], [DatumUhrzeitStart], [DatumUhrzeitEnde])
+					VALUES (@KundenID, 2, @tier_id, NULL, NULL);
+
+					PRINT('Die Buchung war erfolgreich. Gute Fahrt!')
+				END
+
+		END -- if-Abfrage counter=1
 		
 	END TRY 
 

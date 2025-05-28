@@ -1,14 +1,34 @@
 USE TierTaxi
 GO
 
+SELECT  dbo.tb_Tierart.Tierart, 
+		dbo.tb_Tierart.Mitnahmegewicht, 
+		dbo.tb_Tier.Tier_ID, 
+		dbo.tb_Tier.Tier, 
+		dbo.tb_Tier.Tap_ID, 
+		dbo.tb_Tier.Standort_ID AS 'TierStandort', 
+		dbo.tb_Standort.Standort, 
+        dbo.tb_Kunden.Kunden_ID, 
+		dbo.tb_Kunden.KundenNachname, 
+		dbo.tb_Kunden.Kundengewicht,
+		dbo.tb_Kunden.Standort_ID AS 'KundenStandort'
+FROM    dbo.tb_Tierart 
+		INNER JOIN
+			dbo.tb_Tier ON dbo.tb_Tierart.Tierart_ID = dbo.tb_Tier.Tierart_ID 
+		INNER JOIN
+			dbo.tb_Standort ON dbo.tb_Tier.Standort_ID = dbo.tb_Standort.Standort_ID 
+		INNER JOIN
+			dbo.tb_Kunden ON dbo.tb_Standort.Standort_ID = dbo.tb_Kunden.Standort_ID
+
+
 -- ===================================================================================================
--- Test1: Auftrag ablehenen, wenn am Standort kein Tier ist, dass das entsprechende Mitnahmegewicht leisten kann
+-- Test1: Fehler, wenn der Kunde nicht exsistiert
 -- ===================================================================================================
 DECLARE	@Erfolg bit; -- geklappt oder nicht
 DECLARE	@Feedback NVARCHAR(MAX); -- Fehlermeldungen etc.
 
 EXEC [dbo].[sp_Buchungsprozess]
-	3, -- KundenID
+	123, -- KundenID
 	----------------------- 
 	@Erfolg OUTPUT,
 	@Feedback OUTPUT;
@@ -17,13 +37,13 @@ PRINT @Erfolg;
 PRINT @Feedback;
 
 -- ===================================================================================================
--- Test2: Fehler, wenn der Kunde nicht exsistiert
+-- Test2: Auftrag ablehenen, wenn am Standort kein Tier ist, dass das entsprechende Mitnahmegewicht leisten kann
 -- ===================================================================================================
 DECLARE	@Erfolg bit; -- geklappt oder nicht
 DECLARE	@Feedback NVARCHAR(MAX); -- Fehlermeldungen etc.
 
 EXEC [dbo].[sp_Buchungsprozess]
-	123, -- KundenID
+	3, -- KundenID
 	----------------------- 
 	@Erfolg OUTPUT,
 	@Feedback OUTPUT;
@@ -47,48 +67,14 @@ PRINT @Erfolg;
 PRINT @Feedback;
 
 -- ===================================================================================================
--- Test4: Kunde exsistiert und am Standort gibt es ein geeignetes Tier 
-	--> Tier hat aber kein gültiges TAP
+-- Test4: Es gibt mehrere Tiere am Kundenstandort, die geeignet und frei sind. Wird die Buchung
+-- korrekt eingetragen?
 -- ===================================================================================================
 DECLARE	@Erfolg bit; -- geklappt oder nicht
 DECLARE	@Feedback NVARCHAR(MAX); -- Fehlermeldungen etc.
 
 EXEC [dbo].[sp_Buchungsprozess]
-	4, -- KundenID
-	----------------------- 
-	@Erfolg OUTPUT,
-	@Feedback OUTPUT;
-
-PRINT @Erfolg;
-PRINT @Feedback;
-
--- ===================================================================================================
--- Test5: Kunde exsistiert und am Standort gibt es ein geeignetes Tier, das ein gueltiges TAP hat,
--- UND: das Tier befindet sich NICHT in einem anderen Auftrag
-	--> Wir der Auftragsstatus korrekt in die Tabelle Auftraege uebernommen?
--- ===================================================================================================
-DECLARE	@Erfolg bit; -- geklappt oder nicht
-DECLARE	@Feedback NVARCHAR(MAX); -- Fehlermeldungen etc.
-
-EXEC [dbo].[sp_Buchungsprozess]
-	1, -- KundenID
-	----------------------- 
-	@Erfolg OUTPUT,
-	@Feedback OUTPUT;
-
-PRINT @Erfolg;
-PRINT @Feedback;
-
--- ===================================================================================================
--- Test6: Kunde exsistiert und am Standort gibt es ein geeignetes Tier, das ein gueltiges TAP hat,
--- UND: das Tier befindet sich in einem anderen Auftrag
-	--> Korrekter Fehler?
--- ===================================================================================================
-DECLARE	@Erfolg bit; -- geklappt oder nicht
-DECLARE	@Feedback NVARCHAR(MAX); -- Fehlermeldungen etc.
-
-EXEC [dbo].[sp_Buchungsprozess]
-	4, -- KundenID
+	8, -- KundenID
 	----------------------- 
 	@Erfolg OUTPUT,
 	@Feedback OUTPUT;
