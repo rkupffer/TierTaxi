@@ -32,9 +32,9 @@ BEGIN
 		
 		SET @CheckResult =
 		(
-		SELECT	Kunden_ID
+		SELECT	Kunde_ID
 		FROM	tb_Kunden
-		WHERE	Kunden_ID = @KundenID
+		WHERE	Kunde_ID = @KundenID
 		)
 
 		IF @CheckResult IS NULL
@@ -71,7 +71,7 @@ BEGIN
 		IF @counter = 0
 		BEGIN
 			INSERT INTO dbo.tb_Auftraege
-			([Kunde_ID], [Auftagsstatus_ID], [Tier_ID], [DatumUhrzeitStart], [DatumUhrzeitEnde])
+			([Kunde_ID], [Auftragsstatus_ID], [Tier_ID], [DatumUhrzeitStart], [DatumUhrzeitEnde])
 			VALUES (@KundenID, 7, NULL, NULL, NULL);
 
 			THROW 50002,'FEHLER: Momentan ist kein geeignetes Tier fuer Sie verfuegbar. Bitte fragen Sie zu einem anderen Zeitpunkt erneut nach.', 1;
@@ -118,7 +118,7 @@ BEGIN
 			IF @status = 1
 				BEGIN
 					INSERT INTO dbo.tb_Auftraege
-					([Kunde_ID], [Auftagsstatus_ID], [Tier_ID], [DatumUhrzeitStart], [DatumUhrzeitEnde])
+					([Kunde_ID], [Auftragsstatus_ID], [Tier_ID], [DatumUhrzeitStart], [DatumUhrzeitEnde])
 					VALUES (@KundenID, 7, NULL, NULL, NULL);
 
 					THROW 50003,'FEHLER: Momentan befinden sich alle Tiere in Betrieb. Bitte fragen Sie zu einem anderen Zeitpunkt erneut nach.', 1;
@@ -130,7 +130,7 @@ BEGIN
 			ELSE
 				BEGIN
 					INSERT INTO dbo.tb_Auftraege
-					([Kunde_ID], [Auftagsstatus_ID], [Tier_ID], [DatumUhrzeitStart], [DatumUhrzeitEnde])
+					([Kunde_ID], [Auftragsstatus_ID], [Tier_ID], [DatumUhrzeitStart], [DatumUhrzeitEnde])
 					VALUES (@KundenID, 2, @tier_id, NULL, NULL);
 
 					PRINT('Die Buchung war erfolgreich. Gute Fahrt!')
@@ -146,7 +146,7 @@ BEGIN
 			SELECT	[Auftrags_ID]
 			FROM	[dbo].[tb_Auftraege]
 			WHERE	Kunde_ID = @KundenID
-			AND		Auftagsstatus_ID = 2
+			AND		Auftragsstatus_ID = 2
 			)
 
 		END -- if-Abfrage counter>0
@@ -174,7 +174,7 @@ BEGIN
 			IF @status = 1
 				BEGIN
 					INSERT INTO dbo.tb_Auftraege
-					([Kunde_ID], [Auftagsstatus_ID], [Tier_ID], [DatumUhrzeitStart], [DatumUhrzeitEnde])
+					([Kunde_ID], [Auftragsstatus_ID], [Tier_ID], [DatumUhrzeitStart], [DatumUhrzeitEnde])
 					VALUES (@KundenID, 7, NULL, NULL, NULL);
 
 					THROW 50003,'FEHLER: Momentan befinden sich alle Tiere in Betrieb. Bitte fragen Sie zu einem anderen Zeitpunkt erneut nach.', 1;
@@ -186,7 +186,7 @@ BEGIN
 			ELSE
 				BEGIN
 					INSERT INTO dbo.tb_Auftraege
-					([Kunde_ID], [Auftagsstatus_ID], [Tier_ID], [DatumUhrzeitStart], [DatumUhrzeitEnde])
+					([Kunde_ID], [Auftragsstatus_ID], [Tier_ID], [DatumUhrzeitStart], [DatumUhrzeitEnde])
 					VALUES (@KundenID, 2, @tier_id, NULL, NULL);
 
 					PRINT('Die Buchung war erfolgreich. Gute Fahrt!')

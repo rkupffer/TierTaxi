@@ -8,7 +8,7 @@ SELECT  dbo.tb_Tierart.Tierart,
 		dbo.tb_Tier.Tap_ID, 
 		dbo.tb_Tier.Standort_ID AS 'TierStandort', 
 		dbo.tb_Standort.Standort, 
-        dbo.tb_Kunden.Kunden_ID, 
+        dbo.tb_Kunden.Kunde_ID, 
 		dbo.tb_Kunden.KundenNachname, 
 		dbo.tb_Kunden.Kundengewicht,
 		dbo.tb_Kunden.Standort_ID AS 'KundenStandort'

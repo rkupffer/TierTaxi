@@ -25,19 +25,19 @@ SELECT  dbo.tb_Tierart.Mitnahmegewicht,
 		dbo.tb_Tier.Standort_ID AS 'TierStandort',   
 		dbo.tb_Kunden.Standort_ID AS 'KundenStandort', 
 		dbo.tb_Kunden.Kundengewicht, 
-		dbo.tb_Kunden.Kunden_ID
+		dbo.tb_Kunden.Kunde_ID
 FROM    dbo.tb_Tier 
 			INNER JOIN
 				dbo.tb_Tierart ON dbo.tb_Tier.Tierart_ID = dbo.tb_Tierart.Tierart_ID 
 			CROSS JOIN
 				dbo.tb_Kunden
 WHERE	dbo.tb_Kunden.Kundengewicht < dbo.tb_Tierart.Mitnahmegewicht
-AND		Kunden_ID = @Kunden_ID
+AND		Kunde_ID = @Kunden_ID
 AND		dbo.tb_Tier.Standort_ID =
 		(
 		SELECT 	dbo.tb_Kunden.Standort_ID
 		FROM	[dbo].[tb_Kunden]
-		WHERE	Kunden_ID = @Kunden_ID
+		WHERE	Kunde_ID = @Kunden_ID
 		)
 AND		dbo.tb_Tier.Tap_ID = 1
 )
