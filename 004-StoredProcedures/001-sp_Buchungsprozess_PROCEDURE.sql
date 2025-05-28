@@ -131,23 +131,10 @@ BEGIN
 				BEGIN
 					INSERT INTO dbo.tb_Auftraege
 					([Kunde_ID], [Auftragsstatus_ID], [Tier_ID], [DatumUhrzeitStart], [DatumUhrzeitEnde])
-					VALUES (@KundenID, 2, @tier_id, NULL, NULL);
+					VALUES (@KundenID, 3, @tier_id, NULL, NULL);
 
 					PRINT('Die Buchung war erfolgreich. Gute Fahrt!')
 				END
-
-			-- ========================================
-			-- Aktuelle Auftrags_ID in Variable fuer 
-			-- spaeter speichern
-			-- ========================================
-			DECLARE @auftrags_id int;
-			SET @auftrags_id =
-			(
-			SELECT	[Auftrags_ID]
-			FROM	[dbo].[tb_Auftraege]
-			WHERE	Kunde_ID = @KundenID
-			AND		Auftragsstatus_ID = 2
-			)
 
 		END -- if-Abfrage counter>0
 
@@ -187,7 +174,7 @@ BEGIN
 				BEGIN
 					INSERT INTO dbo.tb_Auftraege
 					([Kunde_ID], [Auftragsstatus_ID], [Tier_ID], [DatumUhrzeitStart], [DatumUhrzeitEnde])
-					VALUES (@KundenID, 2, @tier_id, NULL, NULL);
+					VALUES (@KundenID, 3, @tier_id, NULL, NULL);
 
 					PRINT('Die Buchung war erfolgreich. Gute Fahrt!')
 				END
