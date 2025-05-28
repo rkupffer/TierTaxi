@@ -8,7 +8,7 @@ GO
 -- =============================================
 -- Hat Tier X den letzten TAP bestanden?
 -- =============================================
-CREATE FUNCTION sf_Tap_bestanden
+CREATE OR ALTER FUNCTION sf_Tap_bestanden
 (
 	@Tier_ID int
 )
