@@ -1,0 +1,21 @@
+USE [TierTaxi]
+GO
+
+/****** Object:  Table [dbo].[tb_Standort]    Script Date: 29.05.2025 10:31:04 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[tb_Standort](
+	[Standort_ID] [int] IDENTITY(1,1) NOT NULL,
+	[Standort] [nchar](30) NOT NULL,
+ CONSTRAINT [PK_tb_standort] PRIMARY KEY CLUSTERED 
+(
+	[Standort_ID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+
+
