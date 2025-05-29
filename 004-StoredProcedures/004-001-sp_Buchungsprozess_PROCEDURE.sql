@@ -86,7 +86,7 @@ BEGIN
 			-- ========================================
 			-- Ein Tier auswaehlen
 			-- ========================================
-			WHILE (@i < @counter )
+			WHILE (@i <= @counter )
 				BEGIN
 					-- aktuelle Tier_id auswaehlen
 					SELECT	@tier_id = Tier_ID
@@ -122,7 +122,7 @@ BEGIN
 					([Kunde_ID], [Auftragsstatus_ID], [Tier_ID], [DatumUhrzeitStart], [DatumUhrzeitEnde])
 					VALUES (@KundenID, 7, NULL, NULL, NULL);
 
-					THROW 50003,'FEHLER: Momentan befinden sich alle Tiere in Betrieb. Bitte fragen Sie zu einem anderen Zeitpunkt erneut nach.', 1;
+					THROW 50003,'FEHLER: Prinzipiell gibt es mehrere Tiere an diesem Standort. Momentan befinden sich jedoch alle Tiere in Betrieb. Bitte fragen Sie zu einem anderen Zeitpunkt erneut nach.', 1;
 				END
 
 			-- ========================================
@@ -153,7 +153,8 @@ BEGIN
 		-- ========================================================================
 		-- Wenn genau ein geeignetes Tier am Kundenstandort verfuegbar ist.
 		-- ========================================================================
-		IF @counter=1
+		--IF @counter=1
+		ELSE
 			BEGIN
 				SET @tier_id =
 				(
