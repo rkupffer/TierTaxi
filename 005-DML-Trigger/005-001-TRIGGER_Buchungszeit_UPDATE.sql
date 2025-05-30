@@ -1,21 +1,22 @@
--- ==============================================================
--- An dieser Stelle im Buchungsprozess setzt der Trigger an:
--- Ein Kunde hat bereits ein Tier ausgeliehen und beendet die Buchung. 
--- Wenn die Endzeit der Buchung in die Tabelle Auftraege eingetragen
--- berechnet sich automatisch die Gesamtdauer (berechnete Spalte)
--- und es wird (ausgelöst durch diesen Trigger) eine Zeile in der 
--- Tabelle Rechnung mit den entsprechenden Daten angelegt.
--- ==============================================================
+USE [TierTaxi]
+GO
 
-CREATE OR ALTER TRIGGER trg_Buchungszeit_Insert
+/****** Object:  Trigger [dbo].[trg_Buchungszeit_Insert]    Script Date: 30.05.2025 09:24:41 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+-- Trigger erstellen
+CREATE OR ALTER TRIGGER [dbo].[trg_Buchungszeit_Insert]
 ON [dbo].[tb_Auftraege]
 AFTER UPDATE
 AS
 BEGIN
     SET NOCOUNT ON;
     
-    -- Neue Zeilen in Rechnung einfügen für alle Datensätze,
-    -- bei denen Buchungszeit von NULL auf einen Wert geändert wurde
+    -- Neue Zeilen in Tabelle Rechnung einfügen wenn bei denen Buchungszeit_Ende von NULL auf einen Wert geändert wurde
     INSERT INTO [dbo].[tb_Rechnung] (
         Auftrags_ID,			
         Gesamtdauer,			
@@ -25,7 +26,7 @@ BEGIN
     )
     SELECT 
         i.Auftrags_ID,           
-        i.Gesamtdauer,         
+        i.Gesamtdauer,          
 		i.FutterkostenProStunde,
 		i.Kunde_ID
 
@@ -37,4 +38,10 @@ BEGIN
         
  
 END;
+
+GO
+
+ALTER TABLE [dbo].[tb_Auftraege] ENABLE TRIGGER [trg_Buchungszeit_Insert]
+GO
+
 
