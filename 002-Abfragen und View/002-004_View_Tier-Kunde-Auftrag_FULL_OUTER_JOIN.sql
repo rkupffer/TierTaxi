@@ -9,7 +9,7 @@ SET QUOTED_IDENTIFIER ON
 GO
 
 
-CREATE VIEW [dbo].[View_Tier-Auftraege]
+CREATE OR ALTER VIEW [dbo].[View_Tier-Auftraege]
 AS
 SELECT  dbo.tb_Kunden.KundenVorname, dbo.tb_Kunden.KundenNachname, dbo.tb_Tier.Tier AS 'TierName', dbo.tb_Auftraege.DatumUhrzeitStart, dbo.tb_Auftraege.DatumUhrzeitEnde
 FROM    dbo.tb_Kunden INNER JOIN
